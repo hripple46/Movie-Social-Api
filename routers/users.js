@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 
 const User = require("../models/user");
 
+//this router is for logging in a user and generating a token
 router.post("/login", async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -25,6 +26,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
+//verifies the token sent by the client
 function verifyToken(req, res, next) {
   //get auth header
   const bearerHeader = req.headers["authorization"];

@@ -6,6 +6,7 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var cors = require("cors");
+const User = require("./models/user");
 
 const app = express();
 const PORT = 3000;
