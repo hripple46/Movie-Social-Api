@@ -14,6 +14,10 @@ const PostSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "User",
   },
+  recommends: {
+    type: Boolean,
+    required: true,
+  },
 });
 
-module.exports = mongoose.model("User", PostSchema);
+module.exports = mongoose.model("Post", PostSchema);

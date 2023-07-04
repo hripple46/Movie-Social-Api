@@ -11,6 +11,7 @@ const app = express();
 const PORT = 3000;
 
 const groupsRouter = require("./routers/groups");
+const usersRouter = require("./routers/users");
 
 mongoose.connect(process.env.MONGODB_PASSWORD);
 
@@ -32,3 +33,4 @@ app.listen(PORT, (error) => {
 });
 
 app.use("/groups", groupsRouter);
+app.use("/users", usersRouter);
