@@ -7,6 +7,7 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var cors = require("cors");
 const User = require("./models/user");
+const Post = require("./models/Post");
 
 const app = express();
 const PORT = 3000;

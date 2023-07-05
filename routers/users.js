@@ -3,6 +3,7 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/user");
+const Group = require("../models/Group");
 
 //this router is for logging in a user and generating a token
 router.post("/login", async (req, res) => {
@@ -16,13 +17,37 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ error: "Incorrect password" });
     } else {
       jwt.sign({ user }, "secretkey", (err, token) => {
+        const userId = user._id;
         res.json({
           token,
+          userId,
         });
       });
     }
   } catch (error) {
     return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+//get all groups for a user
+router.get("/:UserId/groups", verifyToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.UserId);
+    const groups = user.groups;
+    console.log("groups", groups);
+
+    const groupNames = await Promise.all(
+      groups.map(async (group) => {
+        const groupDoc = await Group.findById(group);
+        return groupDoc.name;
+      })
+    );
+
+    console.log("groupNames", groupNames);
+    res.json(groupNames);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server error");
   }
 });
 

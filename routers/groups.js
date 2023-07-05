@@ -2,16 +2,19 @@ const express = require("express");
 const router = express.Router();
 const Group = require("../models/Group");
 
+//this router is for pulling a specific group
 router.get("/:id", async (req, res) => {
   const group = await Group.findById(req.params.id);
   res.json(group);
 });
 
+//this router is for pulling a list of active users
 router.get("/:groupId/activeusers", async (req, res) => {
   const group = await Group.findById(req.params.groupId);
   res.json(group.activeUsers);
 });
 
+//this router is for adding a user to a group
 router.post("/:groupId/activeusers/:userId", async (req, res) => {
   const group = await Group.findById(req.params.groupId);
   const checkIfExists = group.activeUsers.includes(req.params.userId);
@@ -25,6 +28,7 @@ router.post("/:groupId/activeusers/:userId", async (req, res) => {
   res.json(group.activeUsers);
 });
 
+//this router is for pulling list of pending users
 router.get("/:groupId/pendingusers", async (req, res) => {
   const group = await Group.findById(req.params.groupId);
   return res.json(group.pendingUsers);
