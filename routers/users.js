@@ -31,24 +31,31 @@ router.post("/login", async (req, res) => {
 
 //get all groups for a user
 router.get("/:UserId/groups", verifyToken, async (req, res) => {
-  try {
-    const user = await User.findById(req.params.UserId);
-    const groups = user.groups;
-    console.log("groups", groups);
+  jwt.verify(req.token, "secretkey", async (err, authData) => {
+    console.log("Request", req.token);
+    if (err) {
+      res.sendStatus(403);
+    } else {
+      try {
+        const user = await User.findById(req.params.UserId);
+        const groups = user.groups;
+        console.log("groups", groups);
 
-    const groupNames = await Promise.all(
-      groups.map(async (group) => {
-        const groupDoc = await Group.findById(group);
-        return groupDoc.name;
-      })
-    );
+        const groupNames = await Promise.all(
+          groups.map(async (group) => {
+            const groupDoc = await Group.findById(group);
+            return groupDoc.name;
+          })
+        );
 
-    console.log("groupNames", groupNames);
-    res.json(groupNames);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Server error");
-  }
+        console.log("groupNames", groupNames);
+        res.json({ groupNames, authData });
+      } catch (err) {
+        console.error(err);
+        res.status(500).send("Server error");
+      }
+    }
+  });
 });
 
 //verifies the token sent by the client

@@ -34,4 +34,7 @@ router.get("/:groupId/pendingusers", async (req, res) => {
   return res.json(group.pendingUsers);
 });
 
+//this router gets all posts for a group
+router.get("/:groupId/posts", async (req, res) => {});
+
 module.exports = router;
