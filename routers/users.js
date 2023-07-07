@@ -44,7 +44,7 @@ router.get("/:UserId/groups", verifyToken, async (req, res) => {
         const groupNames = await Promise.all(
           groups.map(async (group) => {
             const groupDoc = await Group.findById(group);
-            return groupDoc.name;
+            return { name: groupDoc.name, id: groupDoc._id };
           })
         );
 
