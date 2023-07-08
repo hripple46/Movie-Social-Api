@@ -29,6 +29,23 @@ router.post("/login", async (req, res) => {
   }
 });
 
+//get user info
+router.get("/:UserId", verifyToken, async (req, res) => {
+  jwt.verify(req.token, "secretkey", async (err, authData) => {
+    if (err) {
+      res.sendStatus(403);
+    } else {
+      try {
+        const user = await User.findById(req.params.UserId);
+        res.json(user);
+      } catch (err) {
+        console.error(err);
+        res.status(500).send("Server error");
+      }
+    }
+  });
+});
+
 //get all groups for a user
 router.get("/:UserId/groups", verifyToken, async (req, res) => {
   jwt.verify(req.token, "secretkey", async (err, authData) => {
