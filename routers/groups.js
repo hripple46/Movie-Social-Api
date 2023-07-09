@@ -60,7 +60,7 @@ router.get("/:groupId/posts", verifyToken, async (req, res) => {
           //return posts
           res.json({ groupPosts, authData });
         } else {
-          res.sendStatus(403).send("User not in group");
+          res.status(403).send("User not in group");
         }
       } catch (err) {
         console.error(err);
