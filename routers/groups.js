@@ -51,11 +51,11 @@ router.get("/:groupId/posts", verifyToken, async (req, res) => {
         if (group.activeUsers.includes(authData.user._id)) {
           const posts = group.posts;
           //get all posts
-          const groupPosts = await Promise.all(
-            posts.map(async (post) => {
-              return await Post.findById(post);
-            })
-          );
+          const groupPosts = [];
+          for (let i = 0; i < posts.length; i++) {
+            const post = await Post.findById(posts[i]);
+            groupPosts.push(post);
+          }
           console.log("posts", posts);
           //return posts
           res.json({ groupPosts, authData });
