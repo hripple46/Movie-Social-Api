@@ -1,9 +1,36 @@
 const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 
 const User = require("../models/user");
 const Group = require("../models/Group");
+
+//this router is for creating a new user
+router.post("/signup", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const userExists = await User.findOne({ username });
+    //check if user exists
+    if (userExists) {
+      return res.status(400).json({ error: "User already exists" });
+    } else {
+      //hash password
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+      //create new user
+      const newUser = new User({
+        username,
+        password: hashedPassword,
+      });
+      //save user
+      await newUser.save();
+      res.json(newUser);
+    }
+  } catch (error) {
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 //this router is for logging in a user and generating a token
 router.post("/login", async (req, res) => {
