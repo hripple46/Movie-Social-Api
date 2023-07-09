@@ -40,17 +40,23 @@ router.post("/login", async (req, res) => {
     if (!user) {
       return res.status(401).json({ error: "User does not exist" });
     }
-    if (password !== user.password) {
-      return res.status(401).json({ error: "Incorrect password" });
-    } else {
-      jwt.sign({ user }, "secretkey", (err, token) => {
-        const userId = user._id;
-        res.json({
-          token,
-          userId,
+    //check if password is correct
+    bcrypt.compare(password, user.password, (err, isMatch) => {
+      if (err) {
+        res.status(403).json({ error: "Incorrect password" });
+      }
+      if (isMatch) {
+        jwt.sign({ user }, "secretkey", (err, token) => {
+          const userId = user._id;
+          res.json({
+            token,
+            userId,
+          });
         });
-      });
-    }
+      } else {
+        res.status(403).json({ error: "Incorrect password" });
+      }
+    });
   } catch (error) {
     return res.status(500).json({ error: "Internal server error" });
   }
