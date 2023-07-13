@@ -19,10 +19,13 @@ router.get("/:groupId/activeusers", async (req, res) => {
 //this router is for adding a user to a group
 router.post("/:groupId/activeusers/:userId", async (req, res) => {
   const group = await Group.findById(req.params.groupId);
+
+  //check if user is already in group
   const checkIfExists = group.activeUsers.includes(req.params.userId);
   if (checkIfExists) {
     return res.status(400).send("User Already Belongs to Group");
   }
+  //remove user from pending list and add to active list
   const index = group.pendingUsers.indexOf(req.params.userId);
   group.pendingUsers.splice(index, 1);
   await group.activeUsers.push(req.params.userId);
@@ -34,6 +37,24 @@ router.post("/:groupId/activeusers/:userId", async (req, res) => {
 router.get("/:groupId/pendingusers", async (req, res) => {
   const group = await Group.findById(req.params.groupId);
   return res.json(group.pendingUsers);
+});
+
+//this router adds a user to the pending list
+router.post("/:groupName/pendingusers/:userId", async (req, res) => {
+  const group = await Group.findOne({ name: req.params.groupName });
+  //check if group exists
+  if (!group || !group.activeUsers) {
+    return res.status(500).send("Server error");
+  }
+  //check if user is already in group
+  const checkIfExists = group.activeUsers.includes(req.params.userId);
+  if (checkIfExists) {
+    return res.status(400).send("User Already Belongs to Group");
+  }
+  //add user to pending list
+  await group.pendingUsers.push(req.params.userId);
+  await group.save();
+  res.json(group.pendingUsers);
 });
 
 //this router gets all posts for a group
