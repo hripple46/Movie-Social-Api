@@ -33,6 +33,21 @@ router.post("/:groupId/activeusers/:userId", async (req, res) => {
   res.json(group.activeUsers);
 });
 
+//router for denying a user from a group
+router.delete("/:groupId/pendingusers/:userId", async (req, res) => {
+  const group = await Group.findById(req.params.groupId);
+  //check if user is in pending list
+  const checkIfExists = group.pendingUsers.includes(req.params.userId);
+  if (!checkIfExists) {
+    return res.status(400).send("User Not in Pending List");
+  }
+  //remove user from pending list
+  const index = group.pendingUsers.indexOf(req.params.userId);
+  group.pendingUsers.splice(index, 1);
+  await group.save();
+  res.json(group.pendingUsers);
+});
+
 //this router is for pulling list of pending users
 router.get("/:groupId/pendingusers", async (req, res) => {
   const group = await Group.findById(req.params.groupId);

@@ -71,6 +71,7 @@ router.get("/:UserId", verifyToken, async (req, res) => {
       try {
         const user = await User.findById(req.params.UserId);
         res.json(user);
+        console.log("user", user);
       } catch (err) {
         console.error(err);
         res.status(500).send("Server error");
