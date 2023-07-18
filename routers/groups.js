@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Group = require("../models/Group");
+const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 const Post = require("../models/Post");
 
@@ -30,6 +31,11 @@ router.post("/:groupId/activeusers/:userId", async (req, res) => {
   group.pendingUsers.splice(index, 1);
   await group.activeUsers.push(req.params.userId);
   await group.save();
+  //add group to users list of groups
+  const user = await User.findById(req.params.userId);
+  await user.groups.push(req.params.groupId);
+  await user.save();
+
   res.json(group.activeUsers);
 });
 
