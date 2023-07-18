@@ -112,6 +112,29 @@ router.get("/:groupId/posts", verifyToken, async (req, res) => {
   });
 });
 
+//this router adds a post to a group
+router.post("/:groupId/posts", verifyToken, async (req, res) => {
+  //verify token
+  jwt.verify(req.token, "secretkey", async (err, authData) => {
+    console.log("Request", req.token);
+    if (err) {
+      res.sendStatus(403);
+    } else {
+      try {
+        const group = await Group.findById(req.params.groupId);
+        const post = await new Post({
+          //create new post here
+        });
+        await post.save();
+        await group.posts.push(post._id);
+      } catch (err) {
+        console.error(err);
+        res.status(500).send("Server error");
+      }
+    }
+  });
+});
+
 //verifies the token sent by the client
 function verifyToken(req, res, next) {
   //get auth header
