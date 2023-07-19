@@ -96,7 +96,12 @@ router.get("/:groupId/posts", verifyToken, async (req, res) => {
           const groupPosts = [];
           for (let i = 0; i < posts.length; i++) {
             const post = await Post.findById(posts[i]);
-            groupPosts.push(post);
+            if (post.user !== undefined) {
+              const user = await User.findById(post.user);
+              groupPosts.push({ post, user });
+            } else {
+              groupPosts.push({ post });
+            }
           }
           console.log("posts", posts);
           //return posts
@@ -122,11 +127,16 @@ router.post("/:groupId/posts", verifyToken, async (req, res) => {
     } else {
       try {
         const group = await Group.findById(req.params.groupId);
-        const post = await new Post({
-          //create new post here
+        const post = new Post({
+          movie: req.body.movie,
+          group: req.body.group.id,
+          user: req.body.user._id,
+          recommends: req.body.recommends,
         });
         await post.save();
         await group.posts.push(post._id);
+        await group.save();
+        res.json(post);
       } catch (err) {
         console.error(err);
         res.status(500).send("Server error");
