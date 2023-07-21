@@ -145,6 +145,30 @@ router.post("/:groupId/posts", verifyToken, async (req, res) => {
   });
 });
 
+//router for creating a new group
+router.post("/", verifyToken, async (req, res) => {
+  //check if group exists
+  const groupExists = await Group.findOne({ name: req.body.name });
+  if (groupExists) {
+    return res.status(400).send("Group already exists");
+  } else {
+    const group = new Group({
+      name: req.body.name,
+      admin: req.body.admin,
+      posts: [],
+      pendingUsers: [],
+      activeUsers: [req.body.admin],
+    });
+    try {
+      await group.save();
+      res.json(group);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("Server error");
+    }
+  }
+});
+
 //verifies the token sent by the client
 function verifyToken(req, res, next) {
   //get auth header
