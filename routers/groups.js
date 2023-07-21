@@ -154,9 +154,11 @@ router.post("/", verifyToken, async (req, res) => {
   } else {
     const group = new Group({
       name: req.body.name,
+      //set admin to user id
       admin: req.body.admin,
       posts: [],
       pendingUsers: [],
+      //add admin to active users
       activeUsers: [req.body.admin],
     });
     try {
