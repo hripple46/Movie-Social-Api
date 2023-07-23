@@ -147,28 +147,38 @@ router.post("/:groupId/posts", verifyToken, async (req, res) => {
 
 //router for creating a new group
 router.post("/", verifyToken, async (req, res) => {
-  //check if group exists
-  const groupExists = await Group.findOne({ name: req.body.name });
-  if (groupExists) {
-    return res.status(400).send("Group already exists");
-  } else {
-    const group = new Group({
-      name: req.body.name,
-      //set admin to user id
-      admin: req.body.admin,
-      posts: [],
-      pendingUsers: [],
-      //add admin to active users
-      activeUsers: [req.body.admin],
-    });
-    try {
-      await group.save();
-      res.json(group);
-    } catch (err) {
-      console.error(err);
-      res.status(500).send("Server error");
+  console.log("Body", req.body);
+  jwt.verify(req.token, "secretkey", async (err, authData) => {
+    //check if group exists
+    const groupExists = await Group.findOne({ name: req.body.name });
+    //get user
+    const user = await User.findById(req.body.admin._id);
+    if (groupExists) {
+      return res.status(400).send("Group already exists");
+    } else {
+      const group = new Group({
+        name: req.body.name,
+        //set admin to user id
+        admin: req.body.admin._id,
+        posts: [],
+        pendingUsers: [],
+        //add admin to active users
+        activeUsers: [req.body.admin._id],
+      });
+      try {
+        await group.save();
+        user.groups.push(group._id);
+        //add group to users admin list
+        user.admin.push(group._id);
+        await user.save();
+
+        res.json(group);
+      } catch (err) {
+        console.error(err);
+        res.status(500).send("Server error");
+      }
     }
-  }
+  });
 });
 
 //verifies the token sent by the client

@@ -1,5 +1,5 @@
 {
-  "editor.fontFamily": "Victor Mono",
+  "editor.fontFamily": "Victor Mono, Victor Mono Italic",
   "editor.fontLigatures": true,
   "editor.tokenColorCustomizations": {
     "textMateRules": [
