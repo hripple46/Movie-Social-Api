@@ -10,7 +10,7 @@ const User = require("./models/user");
 const Post = require("./models/Post");
 
 const app = express();
-const PORT = 3000;
+const PORT = 8080;
 
 const groupsRouter = require("./routers/groups");
 const usersRouter = require("./routers/users");

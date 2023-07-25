@@ -78,7 +78,6 @@ router.post("/:groupName/pendingusers/:userId", async (req, res) => {
   res.json(group.pendingUsers);
 });
 
-//this router gets all posts for a group
 router.get("/:groupId/posts", verifyToken, async (req, res) => {
   //verify token
   jwt.verify(req.token, "secretkey", async (err, authData) => {
@@ -88,22 +87,22 @@ router.get("/:groupId/posts", verifyToken, async (req, res) => {
     } else {
       try {
         //check if user is in group
-        const group = await Group.findById(req.params.groupId);
+        const group = await Group.findById(req.params.groupId).populate({
+          path: "posts",
+          populate: {
+            path: "user",
+            model: "User",
+          },
+        });
         //if user is in group, return posts
         if (group.activeUsers.includes(authData.user._id)) {
-          const posts = group.posts;
-          //get all posts
-          const groupPosts = [];
-          for (let i = 0; i < posts.length; i++) {
-            const post = await Post.findById(posts[i]);
-            if (post.user !== undefined) {
-              const user = await User.findById(post.user);
-              groupPosts.push({ post, user });
+          const groupPosts = group.posts.map((post) => {
+            if (post.user) {
+              return { post, user: post.user };
             } else {
-              groupPosts.push({ post });
+              return { post };
             }
-          }
-          console.log("posts", posts);
+          });
           //return posts
           res.json({ groupPosts, authData });
         } else {
