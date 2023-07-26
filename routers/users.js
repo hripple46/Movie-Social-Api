@@ -155,19 +155,19 @@ router.post("/reset", async (req, res) => {
   }
 });
 //router got getting user reset link
-router.get("/reset/:userId/:token", verifyResetToken, async (req, res) => {
-  const user = await User.findById(req.params.userId);
-  if (!user) {
-    res.status(400).json({ error: "User does not exist" });
-  } else {
-    jwt.verify(req.token, "secretkey", (err, authData) => {
-      if (err) {
-        res.sendStatus(403);
-      } else {
-        res.status(200).json({ user });
+router.post("/reset/:token", verifyResetToken, async (req, res) => {
+  jwt.verify(req.token, "secretkey", async (err, authData) => {
+    if (err) {
+      res.sendStatus(403);
+    } else {
+      try {
+        res.json({ authData });
+      } catch (err) {
+        console.error(err);
+        res.status(500).send("Server error");
       }
-    });
-  }
+    }
+  });
 });
 
 //verifies the token sent by the client
