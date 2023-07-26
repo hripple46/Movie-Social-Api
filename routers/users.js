@@ -1,8 +1,11 @@
+require("dotenv").config();
+
 const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { body, validationResult } = require("express-validator");
+const nodemailer = require("nodemailer");
 
 const User = require("../models/user");
 const Group = require("../models/Group");
@@ -116,6 +119,57 @@ router.get("/:UserId/groups", verifyToken, async (req, res) => {
   });
 });
 
+//router for resetting a password
+router.post("/reset", async (req, res) => {
+  const email = req.body.email;
+  const user = await User.findOne({ email });
+  if (!user) {
+    res.status(400).json({ error: "Email does not exist" });
+  } else {
+    jwt.sign({ user }, "secretkey", (err, token) => {
+      //send email
+      const url = `https://billowing-dawn-923.fly.dev/reset-password/${token}`;
+      var transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: process.env.EMAIL,
+          pass: process.env.EMAIL_PASSWORD,
+        },
+      });
+
+      var mailOptions = {
+        from: process.env.EMAIL,
+        to: user.email,
+        subject: "One-Time Password Reset Link",
+        text: "Please click the link below to reset your password" + url,
+      };
+
+      transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+          res.status(500).json({ error: "Internal server error" });
+        } else {
+          res.status(200).json({ message: "Email sent" });
+        }
+      });
+    });
+  }
+});
+//router got getting user reset link
+router.get("/reset/:userId/:token", verifyResetToken, async (req, res) => {
+  const user = await User.findById(req.params.userId);
+  if (!user) {
+    res.status(400).json({ error: "User does not exist" });
+  } else {
+    jwt.verify(req.token, "secretkey", (err, authData) => {
+      if (err) {
+        res.sendStatus(403);
+      } else {
+        res.status(200).json({ user });
+      }
+    });
+  }
+});
+
 //verifies the token sent by the client
 function verifyToken(req, res, next) {
   //get auth header
@@ -127,6 +181,20 @@ function verifyToken(req, res, next) {
     const bearer = bearerHeader.split(" ");
     //get token
     const bearerToken = bearer[1];
+    //set token
+    req.token = bearerToken;
+    //next middleware
+    next();
+  } else {
+    res.sendStatus(403);
+  }
+}
+//verifies the reset token sent by the client from the params
+function verifyResetToken(req, res, next) {
+  //get auth header
+  const bearerToken = req.params.token;
+
+  if (typeof bearerToken !== "undefined") {
     //set token
     req.token = bearerToken;
     //next middleware
