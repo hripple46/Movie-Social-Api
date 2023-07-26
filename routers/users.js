@@ -161,7 +161,7 @@ router.post("/reset-password/:token", verifyResetToken, async (req, res) => {
       res.sendStatus(403);
     } else {
       try {
-        const { password } = req.body.password;
+        const { password } = req.body;
         const user = await User.findById(authData.user._id);
         //hash password
         const salt = await bcrypt.genSalt(10);
