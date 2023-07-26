@@ -128,7 +128,7 @@ router.post("/reset", async (req, res) => {
   } else {
     jwt.sign({ user }, "secretkey", (err, token) => {
       //send email
-      const url = `https://billowing-dawn-923.fly.dev/reset-password/${token}`;
+      const url = `https://movie-groups.com/reset-password/${token}`;
       var transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
