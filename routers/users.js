@@ -156,7 +156,7 @@ router.post("/reset", async (req, res) => {
 });
 //router got getting user reset link
 router.post("/reset-password/:token", verifyResetToken, async (req, res) => {
-  jwt.verify(req.token, "secretkey", async (err, authData) => {
+  jwt.verify(req.params.token, "secretkey", async (err, authData) => {
     if (err) {
       res.sendStatus(403);
     } else {
