@@ -155,13 +155,22 @@ router.post("/reset", async (req, res) => {
   }
 });
 //router got getting user reset link
-router.post("/reset/:token", verifyResetToken, async (req, res) => {
+router.post("/reset-password/:token", verifyResetToken, async (req, res) => {
   jwt.verify(req.token, "secretkey", async (err, authData) => {
     if (err) {
       res.sendStatus(403);
     } else {
       try {
-        res.json({ authData });
+        const { password } = req.body.password;
+        const user = await User.findById(authData.user._id);
+        //hash password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+        //update password
+        user.password = hashedPassword;
+        await user.save();
+
+        res.status(200).json({ authData: authData, user: user });
       } catch (err) {
         console.error(err);
         res.status(500).send("Server error");
