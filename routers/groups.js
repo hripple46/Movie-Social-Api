@@ -22,7 +22,9 @@ router.post("/:groupId/activeusers/:userId", async (req, res) => {
   const group = await Group.findById(req.params.groupId);
 
   //check if user is already in group
-  const checkIfExists = group.activeUsers.includes(req.params.userId);
+  const checkIfExists = group.activeUsers
+    .map((user) => user.toString())
+    .includes(req.params.userId.toString());
   if (checkIfExists) {
     return res.status(400).send("User Already Belongs to Group");
   }
@@ -68,6 +70,7 @@ router.post("/:groupName/pendingusers/:userId", async (req, res) => {
     return res.status(500).send("Server error");
   }
   //check if user is already in group
+  console.log("userId", req.params.userId);
   const checkIfExists = group.activeUsers.includes(req.params.userId);
   if (checkIfExists) {
     return res.status(400).send("User Already Belongs to Group");
