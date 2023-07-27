@@ -35,7 +35,7 @@ router.post("/:groupId/activeusers/:userId", async (req, res) => {
   await group.save();
   //add group to users list of groups
   const user = await User.findById(req.params.userId);
-  await user.groups.push(req.params.groupId);
+  user.groups.push(req.params.groupId);
   await user.save();
 
   res.json(group.activeUsers);
