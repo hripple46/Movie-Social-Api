@@ -16,6 +16,7 @@ router.post("/signup", body("email").trim().isEmail(), async (req, res) => {
     const result = validationResult(req);
     if (result.isEmpty()) {
       const { username, password, email } = req.body;
+      console.log("password", password);
       const userExists = await User.findOne({ username });
       //check if user exists
       if (userExists) {
