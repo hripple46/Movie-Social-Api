@@ -33,7 +33,7 @@ router.post("/signup", body("email").trim().isEmail(), async (req, res) => {
         });
         //save user
         await newUser.save();
-        res.json(newUser);
+        res.status(200).json(newUser);
       }
     } else {
       res.send({ errors: result.array() });
